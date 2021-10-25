@@ -1,0 +1,1 @@
+source [find board/&&CY_OPEN_OCD_FILE&&]
