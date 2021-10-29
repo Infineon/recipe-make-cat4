@@ -7,12 +7,10 @@ The this release of the 4390X devices GNU make build recipe includes complete su
     * Build
     * Program
     * Debug
-    * IDE Integration (Eclipse, VS Code, IAR, uVision)
+    * IDE Integration (Eclipse, VS Code)
     * BSP Generation
 * Supported toolchains:
     * GCC
-    * IAR
-    * ARMv6
 
 This also includes the getlibs.bash script that can be used directly, or via the make target to download additional git repo based libraries for the application.
 
@@ -30,7 +28,7 @@ This version of the CAT4 build system was validated for compatibility with the f
 
 | Software and Tools                        | Version |
 | :---                                      | :----:  |
-| ModusToolbox Software Environment         | 2.3     |
+| ModusToolbox Software Environment         | 2.4     |
 | GCC Compiler                              | 9.2     |
 
 Minimum required ModusToolbox Software Environment: v2.4
