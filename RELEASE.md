@@ -1,6 +1,15 @@
 # 4390X devices GNU make Build System Release Notes
 This repo provides the build recipe make files and scripts for building and programming 4390X devices applications. Builds can be run either through a command-line interface (CLI) or through the Eclipse IDE for ModusToolbox.
 
+### Known issues
+Debug via FTDI programmer of FreeRTOS related project on xx907 device does not work in Eclipse IDE for ModusToolbox. After Resume operation, you might observe the device stops at the interrupts vector table while it should be running.
+It is caused by a fact that ARM Semihosting on Cortex-A/R chips is not useable with any application which uses the "SVC" instruction.  FreeRTOS uses such SVC instruction to switch between tasks.
+Workaround:
+Open the "Debug" launch configuration
+On the "Startup" tab, uncheck the "Enable ARM Semihosting" checkbox
+Physically power-cycle the board (re-plug the USB connector)
+Now debugging should work as expected
+
 ### What's Included?
 The this release of the 4390X devices GNU make build recipe includes complete support for building, programming, and debugging 4390X devices application projects. It is expected that a code example contains a top level make file for itself and references a Board Support Package (BSP) that defines specifics items, like the 4390X part, for the target board. Supported functionality includes the following:
 * Supported operations:
