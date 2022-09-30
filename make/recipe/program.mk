@@ -27,10 +27,9 @@ ifeq ($(WHICHFILE),true)
 $(info Processing $(lastword $(MAKEFILE_LIST)))
 endif
 
-#CY_OPENOCD_SYMBOL_IMG=$(CY_CONFIG_DIR)/$(APPNAME).$(CY_TOOLCHAIN_SUFFIX_TARGET)
-CY_OPENOCD_PROGRAM_IMG=$(CY_CONFIG_DIR)/$(APPNAME).$(CY_TOOLCHAIN_SUFFIX_PROGRAM)
 # TRX header is necessary to have the image to pass the first stage bootloader in the 43907 chip. Refer to POSTBUILD
-CY_OPENOCD_SYMBOL_IMG=$(CY_CONFIG_DIR)/$(APPNAME).trx.bin
+_MTB_RECIPE__OPENOCD_SYMBOL_IMG=$(MTB_TOOLS__OUTPUT_CONFIG_DIR)/$(APPNAME).$(MTB_RECIPE__SUFFIX_TARGET)
+_MTB_RECIPE__OPENOCD_PROGRAM_IMG=$(MTB_TOOLS__OUTPUT_CONFIG_DIR)/$(APPNAME).trx.bin
 
 ################################################################################
 #
@@ -57,36 +56,34 @@ CY_OPENOCD_SYMBOL_IMG=$(CY_CONFIG_DIR)/$(APPNAME).trx.bin
 #
 ################################################################################
 
-CY_OPENOCD_EXE=$(CY_INTERNAL_TOOL_openocd_EXE)
-
 APP0_SECTOR_ADDRESS=0x00000000
 
 ifeq ($(OS),Windows_NT)
-CY_PROG_APP_PATH=$(shell cygpath -m --absolute $(CY_OPENOCD_SYMBOL_IMG))
+_MTB_RECIPE__PROG_APP_PATH=$(shell cygpath -m --absolute $(_MTB_RECIPE__OPENOCD_PROGRAM_IMG))
 else
-CY_PROG_APP_PATH=$(abspath $(CY_OPENOCD_SYMBOL_IMG))
+_MTB_RECIPE__PROG_APP_PATH=$(abspath $(_MTB_RECIPE__OPENOCD_PROGRAM_IMG))
 endif
 
-CY_PROG_CMD=$(CY_OPENOCD_EXE) \
-			$(CY_OPENOCD_SCRIPTS) \
+CY_PROG_CMD=$(CY_TOOL_openocd_EXE_ABS) \
+			$(_MTB_RECIPE__OPENOCD_SCRIPTS) \
 			-f "board/cyw9wcd1eval1.cfg" \
-			-c "program $(CY_PROG_APP_PATH) $(APP0_SECTOR_ADDRESS) reset"\
+			-c "program $(_MTB_RECIPE__PROG_APP_PATH) $(APP0_SECTOR_ADDRESS) reset"\
 			-c shutdown $(DOWNLOAD_LOG)
 
-CY_ERASE_CMD=$(CY_OPENOCD_EXE) \
-			$(CY_OPENOCD_SCRIPTS) \
+CY_ERASE_CMD=$(CY_TOOL_openocd_EXE_ABS) \
+			$(_MTB_RECIPE__OPENOCD_SCRIPTS) \
 			-f "board/cyw9wcd1eval1.cfg" \
 			-c "init; reset init; erase_all;"\
 			-c shutdown $(DOWNLOAD_LOG)
 
 erase:
-	$(CY_NOISE)echo;\
+	$(MTB__NOISE)echo;\
 	echo "Erasing target device... ";\
 	$(CY_ERASE_CMD)
 
 program: build qprogram
 
 qprogram: memcalc
-	$(CY_NOISE)echo;\
+	$(MTB__NOISE)echo;\
 	echo "Programming target device... ";\
 	$(CY_PROG_CMD);

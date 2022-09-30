@@ -24,6 +24,9 @@
     //    the list found here:
     //       https://www.segger.com/downloads/supported-devices.php
     //
+    //    To use JLink JTAG interface, update corresponding JLink configuration.
+    //    Set "interface" property to "jtag".
+    //
     "version": "0.2.0",
     "configurations": [
         // When using 'launch', make sure your program is running on the board and that your
@@ -33,12 +36,12 @@
             "name": "Launch 43907 CR4 (FTDI)",
             "type": "cortex-debug",
             "request": "launch",
-            "cwd": "${workspaceRoot}",
-            "executable": "&&CY_ELF_FILE&&",
+            "cwd": "${workspaceFolder}",
+            "executable": "&&_MTB_RECIPE__ELF_FILE&&",
             "servertype": "openocd",
             "searchDir": [
-                "${workspaceRoot}",
-                "${config:modustoolbox.toolsPath}/&&CY_OPENOCD_SCRIPTS_DIR&&/"
+                "${workspaceFolder}",
+                "${config:modustoolbox.toolsPath}/&&_MTB_RECIPE__OPENOCD_SCRIPTS_DIR_RELATIVE&&/"
             ],
             "configFiles": [
                 "openocd.tcl"
@@ -63,26 +66,21 @@
                 "stepi"
             ],
             "overrideRestartCommands": [
-                "start"
+                "starti"
             ],
-            "postRestartSessionCommands": [
-                "monitor gdb_sync",
-                "stepi"
-            ],
-            "runToMain": true,          // if true, program will halt at main. Not used for a restart
-            "showDevDebugOutput": false // When set to true, displays output of GDB.
-                                        // This is helpful when something is not working right
+            "runToEntryPoint": "main",    // Specifies application entry point name where program will halt
+            "showDevDebugOutput": "none"
         },
         {
             "name": "Erase (FTDI)",
             "type": "cortex-debug",
             "request": "launch",
-            "cwd": "${workspaceRoot}",
-            "executable": "&&CY_HEX_FILE&&",
+            "cwd": "${workspaceFolder}",
+            "executable": "&&_MTB_RECIPE__ELF_FILE&&",
             "servertype": "openocd",
             "searchDir": [
-                "${workspaceRoot}",
-                "${config:modustoolbox.toolsPath}/&&CY_OPENOCD_SCRIPTS_DIR&&/"
+                "${workspaceFolder}",
+                "${config:modustoolbox.toolsPath}/&&_MTB_RECIPE__OPENOCD_SCRIPTS_DIR_RELATIVE&&/"
             ],
             "configFiles": [
                 "openocd.tcl"
@@ -91,22 +89,23 @@
                 "init_debug_session"
             ],
             "overrideLaunchCommands": [
-                "monitor erase_all",
+                "monitor erase_all"
+            ],
+            "postStartSessionCommands": [
                 "quit"
             ],
-            "showDevDebugOutput": false // When set to true, displays output of GDB.
-                                        // This is helpful when something is not working right
+            "showDevDebugOutput": "none"
         },
         {
             "name": "Program (FTDI)",
             "type": "cortex-debug",
             "request": "launch",
-            "cwd": "${workspaceRoot}",
-            "executable": "&&CY_HEX_FILE&&",
+            "cwd": "${workspaceFolder}",
+            "executable": "&&_MTB_RECIPE__ELF_FILE&&",
             "servertype": "openocd",
             "searchDir": [
-                "${workspaceRoot}",
-                "${config:modustoolbox.toolsPath}/&&CY_OPENOCD_SCRIPTS_DIR&&/"
+                "${workspaceFolder}",
+                "${config:modustoolbox.toolsPath}/&&_MTB_RECIPE__OPENOCD_SCRIPTS_DIR_RELATIVE&&/"
             ],
             "configFiles": [
                 "openocd.tcl"
@@ -115,13 +114,14 @@
                 "init_debug_session"
             ],
             "overrideLaunchCommands": [
-                "monitor program &&CY_HEX_FILE&& reset",
+                "monitor program &&_MTB_RECIPE__HEX_FILE&& reset"
+            ],
+            "postStartSessionCommands": [
                 "quit"
             ],
-            "preLaunchTask": "Build: Build [&&CY_CONFIG&&]",    // Set this to run a task from tasks.json
+            "preLaunchTask": "Build",    // Set this to run a task from tasks.json
                                                         // before device programming
-            "showDevDebugOutput": false // When set to true, displays output of GDB.
-                                        // This is helpful when something is not working right
+            "showDevDebugOutput": "none"
         },
         // When using 'launch', make sure your program is running on the board and that your
         // executable matches the image in the chip exactly, or else strange things can happen
@@ -130,57 +130,60 @@
             "name": "Launch 43907 CR4 (JLink)",
             "type": "cortex-debug",
             "request": "launch",
-            "cwd": "${workspaceRoot}",
-            "executable": "&&CY_ELF_FILE&&",
+            "cwd": "${workspaceFolder}",
+            "executable": "&&_MTB_RECIPE__ELF_FILE&&",
             "servertype": "jlink",
             "device": "CYW43907",
+            "interface": "jtag",
             "overrideRestartCommands": [
-                "start"
+                "starti"
             ],
-            "demangle": true,
-            "runToMain": true,          // if true, program will halt at main. Not used for a restart
-            "showDevDebugOutput": false // When set to true, displays output of GDB.
-                                        // This is helpful when something is not working right
+            "runToEntryPoint": "main",    // Specifies application entry point name where program will halt
+            "showDevDebugOutput": "none"
         },
         {
             "name": "Erase (JLink)",
             "type": "cortex-debug",
             "request": "launch",
-            "cwd": "${workspaceRoot}",
+            "cwd": "${workspaceFolder}",
             // executable not needed but need some valid file to get the session to start
-            "executable": "&&CY_HEX_FILE&&",
+            "executable": "&&_MTB_RECIPE__ELF_FILE&&",
             "servertype": "jlink",
             "device": "CYW43907",
+            "interface": "jtag",
             "overrideLaunchCommands": [
                 "monitor exec EnableEraseAllFlashBanks", // enable erasing of external memory
                 "monitor reset",      // Perform pre-reset
                 "monitor flash erase",
-                "monitor reset",      // Perform post-erase reset
+                "monitor reset"       // Perform post-erase reset
+            ],
+            "postStartSessionCommands": [
                 "quit"
             ],
-            "showDevDebugOutput": false // When set to true, displays output of GDB.
-                                        // This is helpful when something is not working right
+            "showDevDebugOutput": "none"
         },
         {
             "name": "Program (JLink)",
             "type": "cortex-debug",
             "request": "launch",
-            "cwd": "${workspaceRoot}",
-            // Program via the hex file to get complete coverage, no need for symbols
-            "executable": "&&CY_HEX_FILE&&",
+            "cwd": "${workspaceFolder}",
+            // executable not needed but need some valid file to get the session to start
+            "executable": "&&_MTB_RECIPE__ELF_FILE&&",
             "servertype": "jlink",
             "device": "CYW43907",
+            "interface": "jtag",
             "overrideLaunchCommands": [
                 "monitor reset",      // Perform pre-reset
-                "mon loadbin &&CY_HEX_FILE&& 0x14000000",
+                "mon loadbin &&_MTB_RECIPE__HEX_FILE&& 0x14000000",
                 "monitor reset",      // Perform post-program reset
-                "monitor go",
+                "monitor go"
+            ],
+            "postStartSessionCommands": [
                 "quit"
             ],
-            "preLaunchTask": "Build: Build [&&CY_CONFIG&&]",    // Set this to run a task from tasks.json
+            "preLaunchTask": "Build",    // Set this to run a task from tasks.json
                                                         // before device programming
-            "showDevDebugOutput": false // When set to true, displays output of GDB.
-                                        // This is helpful when something is not working right
+            "showDevDebugOutput": "none"
         }
     ]
 }

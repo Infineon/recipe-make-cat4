@@ -38,9 +38,9 @@ CY_BSP_DEVGROUP_DEVICES_4390X=CYW43907KWBG CYW54907KWBG CYW43903KUBG CYW43909KRF
 # Path to linker script to use for devices in this group.
 #   - NOTE: Value is a path relative to the BSP's root directory.
 #   - NOTE: TOOLCHAIN is the name of the users selected toolchain.
-#   - NOTE: CY_TOOLCHAIN_SUFFIX_LS is the file extension for the selected 
+#   - NOTE: MTB_TOOLCHAIN_$(TOOLCHAIN)__SUFFIX_LS is the file extension for the selected 
 #           toolchain's linker scripts
-CY_BSP_DEVGROUP_LINKER_SCRIPT_4390X=TOOLCHAIN_$(TOOLCHAIN)/$(DEVICE).$(CY_TOOLCHAIN_SUFFIX_LS)
+CY_BSP_DEVGROUP_LINKER_SCRIPT_4390X=TOOLCHAIN_$(TOOLCHAIN)/linker.$(MTB_TOOLCHAIN_$(TOOLCHAIN)__SUFFIX_LS)
 
 # Enable optional code shared by devices in the 4390X group.
 CY_BSP_DEVGROUP_COMPONENTS_4390X=4390X
@@ -62,15 +62,12 @@ CY_BSP_DEVGROUP_DEFINES_4390X=
 #   - NOTE: addresses should be expressed as a hex value with leading 0x.
 #   - NOTE: sizes should be expressed as decimal byte count.
 CY_BSP_DEVGROUP_START_FLASH_4390X=0x00000000
-CY_BSP_DEVGROUP_SIZE_FLASH_4390X=0
-CY_BSP_DEVGROUP_START_RAM_4390X=0x004A0000
-CY_BSP_DEVGROUP_SIZE_RAM_4390X=0x200000
 
 ################################################################################
 # Include device group support from recipe-make-arm-generic
 ################################################################################
 
 # Make sure the BSP included locate_recipe.mk first.
-$(if $(CY_BASELIB_PATH),,$(error BSP needs to include locate_recipe.mk before device_groups.mk))
+$(if $(MTB_TOOLS__RECIPE_DIR),,$(error BSP needs to include locate_recipe.mk before device_groups.mk))
 
-include $(CY_BASELIB_PATH)/make/recipe/device_groups.mk
+include $(MTB_TOOLS__RECIPE_DIR)/make/recipe/device_groups.mk

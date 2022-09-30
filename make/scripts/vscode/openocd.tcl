@@ -1,1 +1,1 @@
-source [find board/&&CY_OPEN_OCD_FILE&&]
+source [find board/&&_MTB_RECIPE__OPEN_OCD_FILE&&]
