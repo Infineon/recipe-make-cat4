@@ -7,7 +7,7 @@
 #
 ################################################################################
 # \copyright
-# Copyright 2018-2021 Cypress Semiconductor Corporation
+# Copyright 2018-2023 Cypress Semiconductor Corporation
 # SPDX-License-Identifier: Apache-2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -136,7 +136,7 @@ CY_RECIPE_GENERATED_FLAG:=$(if $(filter 0,$(words $(CY_RECIPE_GENERATED))),,TRUE
 
 # Set compiler/assembler defines used to build code.
 #   - NOTE: The -D prefix should be added at this point.
-MTB_RECIPE__DEFINES:=$(sort $(addprefix -D,$(__MTB_RECIPE__ARM_GENERIC_DEFINES) $(BSP_DEFINES) $(DEVICE_DEFINES) CY_TARGET_DEVICE=$(subst -,_,$(DEVICE))))
+MTB_RECIPE__DEFINES=$(sort $(addprefix -D,$(__MTB_RECIPE__ARM_GENERIC_DEFINES) $(BSP_DEFINES) $(DEVICE_DEFINES) CY_TARGET_DEVICE=$(subst -,_,$(DEVICE))))
 
 # Pre-compiled static libraries that should be directly linked in to the app.
 MTB_RECIPE__LIBS=$(_MTB_RECIPE__ARM_GENERIC_LIBS)

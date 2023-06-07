@@ -6,7 +6,7 @@
 #
 ################################################################################
 # \copyright
-# Copyright 2018-2021 Cypress Semiconductor Corporation
+# Copyright 2018-2023 Cypress Semiconductor Corporation
 # SPDX-License-Identifier: Apache-2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,7 +32,24 @@ endif
 #
 # Compatibility interface for this recipe make
 #
-MTB_RECIPE__INTERFACE_VERSION=1
+MTB_RECIPE__INTERFACE_VERSION:=2
+
+# Programming interface description
+ifeq (,$(BSP_PROGRAM_INTERFACE))
+_MTB_RECIPE__PROGRAM_INTERFACE_SUBDIR:=FTDI
+else
+_MTB_RECIPE__PROGRAM_INTERFACE_SUBDIR:=$(BSP_PROGRAM_INTERFACE)
+endif
+ifeq ($(findstring $(_MTB_RECIPE__PROGRAM_INTERFACE_SUBDIR),FTDI JLink),)
+$(call mtb__error,Unable to proceed. $(_MTB_RECIPE__PROGRAM_INTERFACE_SUBDIR) interface is not supported for this device)
+endif
+
+# debug interface validation
+debug_interface_check:
+ifeq ($(filter $(_MTB_RECIPE__PROGRAM_INTERFACE_SUBDIR), FTDI JLink),)
+	$(error "$(_MTB_RECIPE__PROGRAM_INTERFACE_SUBDIR)" interface is not supported for this device. \
+	Supported interfaces are "FTDI JLink")
+endif
 
 #
 # List the supported toolchains
@@ -62,85 +79,3 @@ endif
 _MTB_RECIPE__DEVICE_DIE:=$(DEVICE_$(DEVICE)_DIE)
 
 _MTB_RECIPE__DEVICE_FLASH_KB:=$(DEVICE_$(DEVICE)_FLASH_KB)
-
-################################################################################
-# IDE specifics
-################################################################################
-
-# Eclipse
-MTB_RECIPE__IDE_SUPPORTED:=eclipse vscode
-MTB_RECIPE__IDE_RECIPE_DATA_FILE:=$(MTB_TOOLS__OUTPUT_CONFIG_DIR)/ide_recipe_data.temp
-MTB_RECIPE__IDE_RECIPE_METADATA_FILE:=$(MTB_TOOLS__OUTPUT_CONFIG_DIR)/ide_recipe_metadata.temp
-
-ifeq ($(filter eclipse,$(MAKECMDGOALS)),eclipse)
-
-# Set the output file paths
-ifneq ($(CY_BUILD_LOCATION),)
-_MTB_RECIPE__ECLIPSE_SYM_FILE:=$(MTB_TOOLS__OUTPUT_CONFIG_DIR)/$(APPNAME).$(MTB_RECIPE__SUFFIX_TARGET)
-else
-_MTB_RECIPE__ECLIPSE_SYM_FILE:=$${cy_prj_path}/$(notdir $(MTB_TOOLS__OUTPUT_BASE_DIR))/$(TARGET)/$(CONFIG)/$(APPNAME).$(MTB_RECIPE__SUFFIX_TARGET)
-endif
-
-eclipse_textdata_file:
-	$(call mtb__file_append,$(MTB_RECIPE__IDE_RECIPE_DATA_FILE),&&_MTB_RECIPE__OPENOCD_CFG&&=$(_MTB_RECIPE__OPENOCD_DEVICE_CFG))
-	$(call mtb__file_append,$(MTB_RECIPE__IDE_RECIPE_DATA_FILE),&&_MTB_RECIPE__OPENOCD_CHIP&&=$(_MTB_RECIPE__OPENOCD_CHIP_NAME))
-	$(call mtb__file_append,$(MTB_RECIPE__IDE_RECIPE_DATA_FILE),&&_MTB_RECIPE__APPNAME&&=$(CY_IDE_PRJNAME))
-	$(call mtb__file_append,$(MTB_RECIPE__IDE_RECIPE_DATA_FILE),&&_MTB_RECIPE__CONFIG&&=$(CONFIG))
-	$(call mtb__file_append,$(MTB_RECIPE__IDE_RECIPE_DATA_FILE),&&_MTB_RECIPE__SYM_FILE&&=$(_MTB_RECIPE__ECLIPSE_SYM_FILE))
-	$(call mtb__file_append,$(MTB_RECIPE__IDE_RECIPE_DATA_FILE),&&_MTB_RECIPE__PROG_FILE&&=$(_MTB_RECIPE__HEX_FILE))
-	$(call mtb__file_append,$(MTB_RECIPE__IDE_RECIPE_DATA_FILE),&&_MTB_RECIPE__ECLIPSE_GDB&&=$(CY_ECLIPSE_GDB))
-
-_MTB_ECLIPSE_TEMPLATE_RECIPE_SEARCH:=$(MTB_TOOLS__RECIPE_DIR)/make/scripts/eclipse
-_MTB_ECLIPSE_TEMPLATE_RECIPE_APP_SEARCH:=$(MTB_TOOLS__RECIPE_DIR)/make/scripts/eclipse/Application
-
-eclipse_recipe_metadata_file:
-	$(call mtb__file_append,$(MTB_RECIPE__IDE_RECIPE_METADATA_FILE),RECIPE_TEMPLATE=$(_MTB_ECLIPSE_TEMPLATE_RECIPE_SEARCH))
-	$(call mtb__file_append,$(MTB_RECIPE__IDE_RECIPE_METADATA_FILE),RECIPE_APP_TEMPLATE=$(_MTB_ECLIPSE_TEMPLATE_RECIPE_APP_SEARCH))
-	$(call mtb__file_append,$(MTB_RECIPE__IDE_RECIPE_METADATA_FILE),PROJECT_UUID=&&PROJECT_UUID&&)
-
-endif
-
-# VSCode
-ifeq ($(filter vscode,$(MAKECMDGOALS)),vscode)
-_MTB_RECIPE__GCC_BASE_DIR:=$(subst $(MTB_TOOLS__TOOLS_DIR)/,,$(MTB_TOOLCHAIN_GCC_ARM__BASE_DIR))
-_MTB_RECIPE__GCC_VERSION:=$(shell $(MTB_TOOLCHAIN_GCC_ARM__CC) -dumpversion)
-_MTB_RECIPE__OPENOCD_SCRIPTS_DIR_RELATIVE=$(CY_TOOL_openocd_scripts_SCRIPT)
-_MTB_RECIPE__OPENOCD_EXE_DIR_RELATIVE=$(CY_TOOL_openocd_EXE)
-
-ifneq ($(CY_BUILD_LOCATION),)
-_MTB_RECIPE__ELF_FILE:=$(MTB_TOOLS__OUTPUT_CONFIG_DIR)/$(APPNAME).$(MTB_RECIPE__SUFFIX_TARGET)
-else
-_MTB_RECIPE__ELF_FILE:=./$(notdir $(MTB_TOOLS__OUTPUT_BASE_DIR))/$(TARGET)/$(CONFIG)/$(APPNAME).$(MTB_RECIPE__SUFFIX_TARGET)
-endif
-
-# This must set with = instead of :=
-_MTB_RECIPE__C_FLAGS=$(subst $(MTB__SPACE),\"$(MTB__COMMA)$(MTB__NEWLINE_MARKER)\",$(strip $(MTB_RECIPE__CFLAGS)))
-
-ifeq ($(CY_ATTACH_SERVER_TYPE),)
-CY_ATTACH_SERVER_TYPE=openocd
-endif
-
-_MTB_VSCODE_MODUS_SHELL_RELATIVE=$(CY_TOOL_modus-shell_BASE)
-
-$(MTB_RECIPE__IDE_RECIPE_DATA_FILE):
-	$(MTB__NOISE)echo "s|&&_MTB_RECIPE__ELF_FILE&&|$(_MTB_RECIPE__ELF_FILE)|g;" > $@;\
-	echo "s|&&_MTB_RECIPE__HEX_FILE&&|$(_MTB_RECIPE__HEX_FILE)|g;" >> $@;\
-	echo "s|&&_MTB_RECIPE__OPEN_OCD_FILE&&|$(_MTB_RECIPE__OPENOCD_DEVICE_CFG)|g;" >> $@;\
-	echo "s|&&_MTB_RECIPE__MTB_PATH&&|$(CY_TOOLS_DIR)|g;" >> $@;\
-	echo "s|&&_MTB_RECIPE__TOOL_CHAIN_DIRECTORY&&|$(subst ",,$(CY_CROSSPATH))|g;" >> $@;\
-	echo "s|&&_MTB_RECIPE__C_FLAGS&&|$(_MTB_RECIPE__C_FLAGS)|g;" >> $@;\
-	echo "s|&&_MTB_RECIPE__GCC_VERSION&&|$(_MTB_RECIPE__GCC_VERSION)|g;" >> $@;\
-	echo "s|&&_MTB_RECIPE__OPENOCD_EXE_DIR_RELATIVE&&|$(_MTB_RECIPE__OPENOCD_EXE_DIR_RELATIVE)|g;" >> $@;\
-	echo "s|&&_MTB_RECIPE__OPENOCD_SCRIPTS_DIR_RELATIVE&&|$(_MTB_RECIPE__OPENOCD_SCRIPTS_DIR_RELATIVE)|g;" >> $@;\
-	echo "s|&&_MTB_RECIPE__CONFIG&&|$(CONFIG)|g;" >> $@;\
-	echo "s|&&_MTB_RECIPE__DEVICE_ATTACH&&|$(_MTB_RECIPE__JLINK_DEVICE_CFG_ATTACH)|g;" >> $@;\
-	echo "s|&&_MTB_RECIPE__MODUS_SHELL_BASE&&|$(_MTB_VSCODE_MODUS_SHELL_RELATIVE)|g;" >> $@;\
-	echo "s|&&_MTB_RECIPE__ATTACH_SERVER_TYPE&&|$(CY_ATTACH_SERVER_TYPE)|g;" >> $@;
-ifeq ($(CY_USE_CUSTOM_GCC),true)
-	$(MTB__NOISE)echo "s|&&_MTB_RECIPE__GCC_BIN_DIR&&|$(MTB_TOOLCHAIN_GCC_ARM__BASE_DIR)/bin|g;" >> $@;\
-	echo "s|&&_MTB_RECIPE__GCC_DIRECTORY&&|$(MTB_TOOLCHAIN_GCC_ARM__BASE_DIR)|g;" >> $@;
-else
-	$(MTB__NOISE)echo "s|&&_MTB_RECIPE__GCC_BIN_DIR&&|$$\{config:modustoolbox.toolsPath\}/$(_MTB_RECIPE__GCC_BASE_DIR)/bin|g;" >> $@;\
-	echo "s|&&_MTB_RECIPE__GCC_DIRECTORY&&|$$\{config:modustoolbox.toolsPath\}/$(_MTB_RECIPE__GCC_BASE_DIR)|g;" >> $@;
-endif
-endif

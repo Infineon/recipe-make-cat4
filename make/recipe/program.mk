@@ -7,7 +7,7 @@
 #
 ################################################################################
 # \copyright
-# Copyright 2018-2021 Cypress Semiconductor Corporation
+# Copyright 2018-2023 Cypress Semiconductor Corporation
 # SPDX-License-Identifier: Apache-2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,31 +31,6 @@ endif
 _MTB_RECIPE__OPENOCD_SYMBOL_IMG=$(MTB_TOOLS__OUTPUT_CONFIG_DIR)/$(APPNAME).$(MTB_RECIPE__SUFFIX_TARGET)
 _MTB_RECIPE__OPENOCD_PROGRAM_IMG=$(MTB_TOOLS__OUTPUT_CONFIG_DIR)/$(APPNAME).trx.bin
 
-################################################################################
-#
-# Note: This was pieced together from MTB 1.0 ES10.3 programming flow.
-# 		1. C&P to browser - https://home.ore.cypress.com/#
-#		2. Click 'software repository' on the right hand side
-#		3. Download and install "ModusToolbox 1.0 ES10.3 (Build 2315)"
-#
-# Reference:
-# "--norc" "--noprofile" "${cy_tools_path:wiced-scripts}/program.bash" 
-# "-kit" 
-# "CYW943907AEVAL1F" 
-# "-shell" "${cy_tools_path:modus-shell}" 
-# "-scripts" "${cy_tools_path:wiced-scripts}" 
-# "-openocd" "${cy_tools_path:openocd}" 
-# "-dct" "${workspace_loc:/WiFiScanner_dct}/${config_name:WiFiScanner_dct}/WiFiScanner_dct.bin" 
-# "-filesystem" "${workspace_loc:/WiFiScanner_resources}/filesystem.bin"
-# "-lut" "${workspace_loc:/WiFiScanner_lut}/${config_name:WiFiScanner_lut}/WiFiScanner_lut.bin" 
-# "-boot" "${workspace_loc:/WiFiScanner_bootloader}/${config_name:WiFiScanner_bootloader}/WiFiScanner_bootloader.trx.bin" 
-# "-app0" "${workspace_loc:/WiFiScanner_mainapp}/${config_name:WiFiScanner_mainapp}/WiFiScanner_mainapp.stripped.elf" 
-# "-flashloader" "${cy_sdk_install_dir}/libraries/wiced_base-1.0/components/WIFI-SDK/platforms/CYW943907AEVAL1F/sflash_write.elf" 
-# "-reset" 
-# "-gdbinit" "${workspace_loc:/WiFiScanner_lut}/.gdbinit"
-#
-################################################################################
-
 APP0_SECTOR_ADDRESS=0x00000000
 
 ifeq ($(OS),Windows_NT)
@@ -64,26 +39,49 @@ else
 _MTB_RECIPE__PROG_APP_PATH=$(abspath $(_MTB_RECIPE__OPENOCD_PROGRAM_IMG))
 endif
 
-CY_PROG_CMD=$(CY_TOOL_openocd_EXE_ABS) \
+CY_PROG_CMD_OPENOCD=$(CY_TOOL_openocd_EXE_ABS) \
 			$(_MTB_RECIPE__OPENOCD_SCRIPTS) \
 			-f "board/cyw9wcd1eval1.cfg" \
 			-c "program $(_MTB_RECIPE__PROG_APP_PATH) $(APP0_SECTOR_ADDRESS) reset"\
 			-c shutdown $(DOWNLOAD_LOG)
 
-CY_ERASE_CMD=$(CY_TOOL_openocd_EXE_ABS) \
+CY_ERASE_CMD_OPENOCD=$(CY_TOOL_openocd_EXE_ABS) \
 			$(_MTB_RECIPE__OPENOCD_SCRIPTS) \
 			-f "board/cyw9wcd1eval1.cfg" \
 			-c "init; reset init; erase_all;"\
 			-c shutdown $(DOWNLOAD_LOG)
 
-erase:
+CY_PROG_CMD_JLINK="$(MTB_CORE__JLINK_EXE)" -AutoConnect 1 -ExitOnError 1 -NoGui 1 -Device CYW43907 -If jtag -Speed auto -CommandFile $(MTB_TOOLS__OUTPUT_CONFIG_DIR)/program.jlink
+CY_ERASE_CMD_JLINK="$(MTB_CORE__JLINK_EXE)" -AutoConnect 1 -ExitOnError 1 -NoGui 1 -Device CYW43907 -If jtag -Speed auto -CommandFile $(MTB_TOOLS__OUTPUT_CONFIG_DIR)/erase.jlink
+
+ifeq ($(_MTB_RECIPE__PROGRAM_INTERFACE_SUBDIR), JLink)
+CY_ERASE_CMD=$(CY_ERASE_CMD_JLINK)
+CY_PROG_CMD=$(CY_PROG_CMD_JLINK)
+else
+CY_ERASE_CMD=$(CY_ERASE_CMD_OPENOCD)
+CY_PROG_CMD=$(CY_PROG_CMD_OPENOCD)
+endif
+
+# Generate command files required by JLink tool for programming/erasing
+jlink_generate:
+	sed "s|&&PROG_FILE&&|$(_MTB_RECIPE__OPENOCD_PROGRAM_IMG)|g;" $(MTB_TOOLS__RECIPE_DIR)/make/scripts/program.jlink > $(MTB_TOOLS__OUTPUT_CONFIG_DIR)/program.jlink
+	cp $(MTB_TOOLS__RECIPE_DIR)/make/scripts/erase.jlink $(MTB_TOOLS__OUTPUT_CONFIG_DIR)/erase.jlink
+
+erase: erase_$(_MTB_RECIPE__PROGRAM_INTERFACE_SUBDIR)
+
+erase_$(_MTB_RECIPE__PROGRAM_INTERFACE_SUBDIR): debug_interface_check
 	$(MTB__NOISE)echo;\
 	echo "Erasing target device... ";\
 	$(CY_ERASE_CMD)
 
-program: build qprogram
+program qprogram: program_$(_MTB_RECIPE__PROGRAM_INTERFACE_SUBDIR)
 
-qprogram: memcalc
+program_$(_MTB_RECIPE__PROGRAM_INTERFACE_SUBDIR): memcalc
+
+program_JLink: jlink_generate
+erase_JLink: jlink_generate
+
+program_$(_MTB_RECIPE__PROGRAM_INTERFACE_SUBDIR) qprogram_$(_MTB_RECIPE__PROGRAM_INTERFACE_SUBDIR): debug_interface_check
 	$(MTB__NOISE)echo;\
 	echo "Programming target device... ";\
 	$(CY_PROG_CMD);

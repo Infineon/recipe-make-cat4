@@ -6,7 +6,7 @@
 #
 ################################################################################
 # \copyright
-# Copyright 2021 Cypress Semiconductor Corporation
+# Copyright 2021-2023 Cypress Semiconductor Corporation
 # SPDX-License-Identifier: Apache-2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -108,11 +108,6 @@ _MTB_TOOLCHAIN_GCC_ARM__COMMON_FLAGS:=\
 	-Wall\
 	-pipe
 
-#
-# NOTE: The official NewLib Nano build leaks file buffers when used with reentrant support.
-# The ModusToolbox 2.2+ installer bundles a version that fixes this leak that has not yet been
-# accepted upstream.
-#
 _MTB_TOOLCHAIN_GCC_ARM__NEWLIBNANO:=--specs=nano.specs --specs=nosys.specs
 
 #
@@ -214,3 +209,5 @@ MTB_TOOLCHAIN_GCC_ARM__DEFINES:=\
 	NO_MALLOC_H \
 	WICED_DISABLE_EXCEPTION_DUMP \
 	$(_MTB_TOOLCHAIN_GCC_ARM__DEBUG_FLAG)
+
+MTB_TOOLCHAIN_GCC_ARM__VSCODE_INTELLISENSE_MODE:=gcc-arm
