@@ -13,6 +13,10 @@ This release of the 4390X device GNU make build recipe includes complete support
     * GCC
 
 ### What Changed?
+#### v2.2.0
+* Use a binary file instead of a hex file for programming using VS Code.
+* Improved stability and bug fixes.
+
 #### v2.1.1
 * Added support for BSP_PROGRAM_INTERFACE to select debug interface. Valid values are "FTDI" and "JLink". Default value is "FTDI".
 * Eclipse and VSCode export will now only generate the launch configuration for the selected programming interface.
@@ -44,5 +48,5 @@ Minimum required ModusToolbox Software Environment: v3.0
 * [ModusToolbox](https://www.infineon.com/cms/en/design-support/tools/sdk/modustoolbox-software)
 
 ---
-© Cypress Semiconductor Corporation, 2019-2023.
+© Cypress Semiconductor Corporation, 2019-2024.
 

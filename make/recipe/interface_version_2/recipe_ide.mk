@@ -6,7 +6,7 @@
 #
 ################################################################################
 # \copyright
-# Copyright 2022-2023 Cypress Semiconductor Corporation
+# Copyright 2022-2024 Cypress Semiconductor Corporation
 # SPDX-License-Identifier: Apache-2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -107,10 +107,10 @@ _MTB_RECIPE__VSCODE_GCC_BASE_DIR:=$(subst $(MTB_TOOLS__TOOLS_DIR)/,$${config:mod
 
 ifneq ($(CY_BUILD_LOCATION),)
 _MTB_RECIPE__VSCODE_ELF_FILE:=$(MTB_TOOLS__OUTPUT_CONFIG_DIR)/$(APPNAME).$(MTB_RECIPE__SUFFIX_TARGET)
-_MTB_RECIPE__VSCODE_HEX_FILE:=$(MTB_TOOLS__OUTPUT_CONFIG_DIR)/$(APPNAME).$(MTB_RECIPE__SUFFIX_PROGRAM)
+_MTB_RECIPE__VSCODE_HEX_FILE:=$(MTB_TOOLS__OUTPUT_CONFIG_DIR)/$(APPNAME).trx.bin
 else #($(CY_BUILD_LOCATION),)
 _MTB_RECIPE__VSCODE_ELF_FILE:=./$(_MTB_RECIPE__IDE_BUILD_PATH_RELATIVE)/$(APPNAME).$(MTB_RECIPE__SUFFIX_TARGET)
-_MTB_RECIPE__VSCODE_HEX_FILE:=./$(_MTB_RECIPE__IDE_BUILD_PATH_RELATIVE)/$(APPNAME).$(MTB_RECIPE__SUFFIX_PROGRAM)
+_MTB_RECIPE__VSCODE_HEX_FILE:=./$(_MTB_RECIPE__IDE_BUILD_PATH_RELATIVE)/$(APPNAME).trx.bin
 endif #($(CY_BUILD_LOCATION),)
 
 ifeq ($(MTB_RECIPE__ATTACH_SERVER_TYPE),)
