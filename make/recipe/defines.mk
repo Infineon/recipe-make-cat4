@@ -2,7 +2,7 @@
 # \file defines.mk
 #
 # \brief
-# Defines, needed for the PSoC 6 build recipe.
+# Defines, needed for the 4390X build recipe.
 #
 ################################################################################
 # \copyright
@@ -33,6 +33,7 @@ endif
 # Compatibility interface for this recipe make
 #
 MTB_RECIPE__INTERFACE_VERSION:=2
+MTB_RECIPE__EXPORT_INTERFACES:=1 2 3
 
 # Programming interface description
 ifeq (,$(BSP_PROGRAM_INTERFACE))
@@ -54,7 +55,14 @@ endif
 #
 # List the supported toolchains
 #
-CY_SUPPORTED_TOOLCHAINS:=GCC_ARM
+ifdef CY_SUPPORTED_TOOLCHAINS
+MTB_SUPPORTED_TOOLCHAINS?=$(CY_SUPPORTED_TOOLCHAINS)
+else
+MTB_SUPPORTED_TOOLCHAINS?=GCC_ARM
+endif
+
+# For BWC with Makefiles that do anything with CY_SUPPORTED_TOOLCHAINS
+CY_SUPPORTED_TOOLCHAINS:=$(MTB_SUPPORTED_TOOLCHAINS)
 
 include $(MTB_TOOLS__RECIPE_DIR)/make/recipe/features.mk
 

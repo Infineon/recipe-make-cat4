@@ -1,5 +1,5 @@
 # 4390X devices GNU make Build System Release Notes
-This repo provides the build recipe make files and scripts for building and programming 4390X devices applications. Builds can be run either through a command-line interface (CLI) or through the Eclipse IDE for ModusToolbox.
+This repo provides the build recipe make files and scripts for building and programming 4390X devices applications. Builds can be run either through a command-line interface (CLI) or through a supported IDE such as Eclipse or VS Code.
 
 ### What's Included?
 This release of the 4390X device GNU make build recipe includes complete support for building, programming, and debugging 4390X device application projects. It is expected that a code example contains a top level make file for itself and references a Board Support Package (BSP) that defines specific items, like the 4390X part, for the target board. Supported functionality includes the following:
@@ -13,13 +13,17 @@ This release of the 4390X device GNU make build recipe includes complete support
     * GCC
 
 ### What Changed?
+#### v2.3.0
+* Added a "last_config" build configuration directory that contains the hex file and elf file from last build.
+* VS Code and Eclipse launch configurations now use "last_config" directory. Launch configurations no longer have to be re-generated when switching between "Debug" and "Release".
+
 #### v2.2.0
 * Use a binary file instead of a hex file for programming using VS Code.
 * Improved stability and bug fixes.
 
 #### v2.1.1
 * Added support for BSP_PROGRAM_INTERFACE to select debug interface. Valid values are "FTDI" and "JLink". Default value is "FTDI".
-* Eclipse and VSCode export will now only generate the launch configuration for the selected programming interface.
+* Eclipse and VS Code export will now only generate the launch configuration for the selected programming interface.
 
 #### v2.0.0
 * Major version update. Significant changes to support ModusToolbox 3.0
@@ -34,11 +38,11 @@ Builds require that the ModusToolbox tools be installed on your machine. This co
 To list the build options, run the "help" target by typing "make help" in CLI. For a verbose documentation on a specific subject type "make help CY\_HELP={variable/target}", where "variable" or "target" is one of the listed make variables or targets.
 
 ### Supported Software and Tools
-This version of the CAT4 build system was validated for compatibility with the following Software and Tools:
+This version of the 4390X build system was validated for compatibility with the following Software and Tools:
 
 | Software and Tools                        | Version |
 | :---                                      | :----:  |
-| ModusToolbox Software Environment         | 3.1     |
+| ModusToolbox Software Environment         | 3.3     |
 | GCC Compiler                              | 11.3    |
 
 Minimum required ModusToolbox Software Environment: v3.0
@@ -48,5 +52,5 @@ Minimum required ModusToolbox Software Environment: v3.0
 * [ModusToolbox](https://www.infineon.com/cms/en/design-support/tools/sdk/modustoolbox-software)
 
 ---
-© Cypress Semiconductor Corporation, 2019-2024.
+(c) 2019-2024, Cypress Semiconductor Corporation (an Infineon company) or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 

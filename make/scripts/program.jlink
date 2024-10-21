@@ -1,5 +1,5 @@
 Connect
-LoadFile &&PROG_FILE&& 0 reset
+LoadFile &&PROG_FILE&& 0x14000000 reset
 Reset
 Go
 Exit

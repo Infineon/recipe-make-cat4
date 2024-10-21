@@ -1,0 +1,1 @@
+source [find board/&&_MTB_RECIPE__OPEN_OCD_FILE&&]

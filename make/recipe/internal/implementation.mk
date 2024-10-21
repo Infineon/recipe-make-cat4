@@ -144,15 +144,6 @@ __MTB_RECIPE__ARM_GENERIC_DEFINES=\
 #   - MTB_CORE__SEARCH_APP_SOURCE  -- source code found by autodiscovery.
 _MTB_RECIPE__ARM_GENERIC_SOURCE=$(MTB_CORE__SEARCH_APP_SOURCE)
 
-# Precompiled code/libraries to link in
-#   - LDLIBS                -- libraries added by user in Makefile.
-#   - CY_BSP_LIBS           -- libraries added by BSP (bypass autodiscovery).
-#   - MTB_CORE__SEARCH_APP_LIBS)   -- libraries found by autodiscovery.
-_MTB_RECIPE__ARM_GENERIC_LIBS=\
-	$(LDLIBS)\
-	$(MTB_CORE__SEARCH_APP_LIBS)
-
-
 ################################################################################
 # Libraries
 ################################################################################
@@ -184,21 +175,7 @@ endif
 # Resource files
 ################################################################################
 
-# These are specific to the core-make resource system and should be left alone.
-#
-_MTB_RECIPE__RESOURCE_FILES=$(CY_SEARCH_RESOURCE_FILES)
-_MTB_RECIPE__GENERATED_FROM_RESOURCES:=$(addprefix $(MTB_TOOLS__OUTPUT_GENERATED_DIR)/,$(addsuffix .$(MTB_TOOLCHAIN_SUFFIX_C),\
-					$(basename $(notdir $(subst .,_,$(CY_SEARCH_RESOURCE_FILES))))))
-_MTB_RECIPE__GENSRC=\
-	bash --norc --noprofile\
-	$(MTB_TOOLS__CORE_DIR)/make/scripts/genresources.bash\
-	$(MTB_TOOLS__TARGET_DIR)/make/scripts\
-	$(MTB_TOOLS__OUTPUT_GENERATED_DIR)/resources.cyrsc\
-	$(MTB_TOOLS__OUTPUT_GENERATED_DIR)\
-	"MEM"
-
 #   - NOTE: this tells core-make the names of any source files generated during the build process.
-#   - NOTE: generated source files should be written to MTB_TOOLS__OUTPUT_GENERATED_DIR.
 #   - NOTE: this must include source files genersated for resource files (this recipe stores
 #           them in _MTB_RECIPE__GENERATED_FROM_RESOURCES).
 _MTB_RECIPE__ARM_GENERIC_GENERATED:=$(CY_BSP_GENERATED) $(_MTB_RECIPE__GENERATED_FROM_RESOURCES)

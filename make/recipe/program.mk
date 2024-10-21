@@ -39,8 +39,23 @@ else
 _MTB_RECIPE__PROG_APP_PATH=$(abspath $(_MTB_RECIPE__OPENOCD_PROGRAM_IMG))
 endif
 
+ifneq ($(MTB_PROBE_SERIAL),)
+_MTB_RECIPE__OPENOCD_PROBE_SERIAL:=adapter serial $(MTB_PROBE_SERIAL);
+_MTB_RECIPE__JLINK_PROBE_SERIAL:=-USB $(MTB_PROBE_SERIAL)
+endif
+
+_MTB_RECIPE__PROBE_INTERFACE:=jtag
+ifneq ($(MTB_PROBE_INTERFACE),)
+_MTB_RECIPE__PROBE_INTERFACE:=$(MTB_PROBE_INTERFACE)
+endif
+
+ifeq ($(_MTB_RECIPE__PROBE_INTERFACE),jtag)
+_MTB_RECIPE__JLINK_JTAG_CONF=-JTAGConf -1,-1
+endif
+
 CY_PROG_CMD_OPENOCD=$(CY_TOOL_openocd_EXE_ABS) \
 			$(_MTB_RECIPE__OPENOCD_SCRIPTS) \
+			-c "$(_MTB_RECIPE__OPENOCD_PROBE_SERIAL)" \
 			-f "board/cyw9wcd1eval1.cfg" \
 			-c "program $(_MTB_RECIPE__PROG_APP_PATH) $(APP0_SECTOR_ADDRESS) reset"\
 			-c shutdown $(DOWNLOAD_LOG)
@@ -51,8 +66,8 @@ CY_ERASE_CMD_OPENOCD=$(CY_TOOL_openocd_EXE_ABS) \
 			-c "init; reset init; erase_all;"\
 			-c shutdown $(DOWNLOAD_LOG)
 
-CY_PROG_CMD_JLINK="$(MTB_CORE__JLINK_EXE)" -AutoConnect 1 -ExitOnError 1 -NoGui 1 -Device CYW43907 -If jtag -Speed auto -CommandFile $(MTB_TOOLS__OUTPUT_CONFIG_DIR)/program.jlink
-CY_ERASE_CMD_JLINK="$(MTB_CORE__JLINK_EXE)" -AutoConnect 1 -ExitOnError 1 -NoGui 1 -Device CYW43907 -If jtag -Speed auto -CommandFile $(MTB_TOOLS__OUTPUT_CONFIG_DIR)/erase.jlink
+CY_PROG_CMD_JLINK="$(MTB_CORE__JLINK_EXE)" -AutoConnect 1 -ExitOnError 1 -NoGui 1 -Device CYW43907 -If $(_MTB_RECIPE__PROBE_INTERFACE) $(_MTB_RECIPE__JLINK_PROBE_SERIAL) $(_MTB_RECIPE__JLINK_JTAG_CONF) -Speed auto -CommandFile $(MTB_TOOLS__OUTPUT_CONFIG_DIR)/program.jlink
+CY_ERASE_CMD_JLINK="$(MTB_CORE__JLINK_EXE)" -AutoConnect 1 -ExitOnError 1 -NoGui 1 -Device CYW43907 -If $(_MTB_RECIPE__PROBE_INTERFACE) $(_MTB_RECIPE__JLINK_PROBE_SERIAL) $(_MTB_RECIPE__JLINK_JTAG_CONF) -Speed auto -CommandFile $(MTB_TOOLS__OUTPUT_CONFIG_DIR)/erase.jlink
 
 ifeq ($(_MTB_RECIPE__PROGRAM_INTERFACE_SUBDIR), JLink)
 CY_ERASE_CMD=$(CY_ERASE_CMD_JLINK)
@@ -78,7 +93,7 @@ program qprogram: program_$(_MTB_RECIPE__PROGRAM_INTERFACE_SUBDIR)
 
 program_$(_MTB_RECIPE__PROGRAM_INTERFACE_SUBDIR): memcalc
 
-program_JLink: jlink_generate
+program_JLink qprogram_JLink: jlink_generate
 erase_JLink: jlink_generate
 
 program_$(_MTB_RECIPE__PROGRAM_INTERFACE_SUBDIR) qprogram_$(_MTB_RECIPE__PROGRAM_INTERFACE_SUBDIR): debug_interface_check
