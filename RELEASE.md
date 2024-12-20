@@ -13,6 +13,9 @@ This release of the 4390X device GNU make build recipe includes complete support
     * GCC
 
 ### What Changed?
+#### v2.4.0
+* Added Ninja support. Ninja build will be enabled by default with ModusToolbox 3.4, and latest core-make. To disable Ninja build set NINJA to empty-String. (For example: "make build NINJA=").
+
 #### v2.3.0
 * Added a "last_config" build configuration directory that contains the hex file and elf file from last build.
 * VS Code and Eclipse launch configurations now use "last_config" directory. Launch configurations no longer have to be re-generated when switching between "Debug" and "Release".
@@ -42,7 +45,7 @@ This version of the 4390X build system was validated for compatibility with the 
 
 | Software and Tools                        | Version |
 | :---                                      | :----:  |
-| ModusToolbox Software Environment         | 3.3     |
+| ModusToolbox Software Environment         | 3.4     |
 | GCC Compiler                              | 11.3    |
 
 Minimum required ModusToolbox Software Environment: v3.0
@@ -53,4 +56,3 @@ Minimum required ModusToolbox Software Environment: v3.0
 
 ---
 (c) 2019-2024, Cypress Semiconductor Corporation (an Infineon company) or an affiliate of Cypress Semiconductor Corporation. All rights reserved.
-

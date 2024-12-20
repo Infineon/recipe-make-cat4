@@ -111,7 +111,7 @@ _MTB_RECIPE__ARM_GENERIC_CORE_DEFINES:=\
 	$(subst -,_,$(DEVICE))\
 	TARGET_$(subst -,_,$(TARGET))\
 	CY_TARGET_BOARD=$(subst -,_,$(TARGET))\
-	$(addprefix COMPONENT_,$(subst -,_,$(_MTB_RECIPE__COMPONENT_LIST)))
+	$(addprefix COMPONENT_,$(subst .,_,$(subst -,_,$(_MTB_RECIPE__COMPONENT_LIST))))
 
 # Add -D to defines specified by user in DEFINES in their Makefile.
 _MTB_RECIPE__ARM_GENERIC_USER_DEFINES=$(DEFINES)

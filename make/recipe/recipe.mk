@@ -32,6 +32,9 @@ endif
 # Inputs to all build recipes
 ################################################################################
 
+_MTB_RECIPE__PROG_FILE:=$(_MTB_RECIPE__HEX_FILE)
+_MTB_RECIPE__TARG_FILE:=$(MTB_TOOLS__OUTPUT_CONFIG_DIR)/$(APPNAME).elf
+
 # 
 # TOOLCHAIN
 #   - The type of TOOLCHAIN used by the application.
@@ -138,11 +141,11 @@ MTB_RECIPE__LIBS=$(_MTB_RECIPE__ARM_GENERIC_LIBS)
 recipe_prebuild:
 	@:
 
+recipe_postbuild: $(_MTB_RECIPE__PROG_FILE)
 # Need to inject TRX header to allow it to actually run
-recipe_postbuild:
-	perl "$(MTB_TOOLS__RECIPE_DIR)/make/scripts/make_trx.pl" "$(MTB_TOOLS__OUTPUT_CONFIG_DIR)/$(APPNAME).elf" "$(MTB_TOOLS__OUTPUT_CONFIG_DIR)/$(APPNAME).trx.bin"
+$(_MTB_RECIPE__PROG_FILE): $(_MTB_RECIPE__TARG_FILE)
+	perl "$(MTB_TOOLS__RECIPE_DIR)/make/scripts/make_trx.pl" "$(_MTB_RECIPE__TARG_FILE)" $@
 
-ifneq ($(CY_SECONDSTAGE),)
 MTB_RECIPE__LAST_CONFIG_DIR:=$(MTB_TOOLS__OUTPUT_BASE_DIR)/last_config
 $(MTB_RECIPE__LAST_CONFIG_DIR):|
 	$(MTB__NOISE)mkdir -p $(MTB_RECIPE__LAST_CONFIG_DIR)
@@ -154,18 +157,16 @@ _MTB_RECIPE__LAST_CONFIG_PROG_FILE_D:=$(_MTB_RECIPE__LAST_CONFIG_PROG_FILE).d
 build_proj qbuild_proj: $(_MTB_RECIPE__LAST_CONFIG_PROG_FILE)
 
 $(_MTB_RECIPE__LAST_CONFIG_PROG_FILE_D): | $(MTB_RECIPE__LAST_CONFIG_DIR)
-	$(MTB__NOISE)echo $(MTB_TOOLS__OUTPUT_CONFIG_DIR)/$(APPNAME).trx.bin > $@.tmp
+	$(MTB__NOISE)echo $(_MTB_RECIPE__PROG_FILE) > $@.tmp
 	$(MTB__NOISE)if ! cmp -s "$@" "$@.tmp"; then \
 		mv -f "$@.tmp" "$@" ; \
 	else \
 		rm -f "$@.tmp"; \
 	fi
 
-$(_MTB_RECIPE__LAST_CONFIG_PROG_FILE): $(_MTB_RECIPE__PROG_FILE) $(_MTB_RECIPE__LAST_CONFIG_PROG_FILE_D) recipe_postbuild
-	$(MTB__NOISE)cp -rf $(MTB_TOOLS__OUTPUT_CONFIG_DIR)/$(APPNAME).trx.bin $@
-	$(MTB__NOISE)cp -rf $(MTB_TOOLS__OUTPUT_CONFIG_DIR)/$(APPNAME).elf $(_MTB_RECIPE__LAST_CONFIG_TARG_FILE)
-
-endif
+$(_MTB_RECIPE__LAST_CONFIG_PROG_FILE): $(_MTB_RECIPE__PROG_FILE) $(_MTB_RECIPE__LAST_CONFIG_PROG_FILE_D) | recipe_postbuild
+	$(MTB__NOISE)cp -f $(_MTB_RECIPE__PROG_FILE) $@
+	$(MTB__NOISE)cp -f $(_MTB_RECIPE__TARG_FILE) $(_MTB_RECIPE__LAST_CONFIG_TARG_FILE)
 
 # If environment (and/or make) variable DEBUG contains word 'RECIPE' dump additional build recipe debug
 # output.
