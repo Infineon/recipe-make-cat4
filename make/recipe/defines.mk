@@ -6,7 +6,8 @@
 #
 ################################################################################
 # \copyright
-# Copyright 2018-2024 Cypress Semiconductor Corporation
+# (c) 2018-2025, Cypress Semiconductor Corporation (an Infineon company) or
+# an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -35,7 +36,7 @@ endif
 MTB_RECIPE__INTERFACE_VERSION:=2
 MTB_RECIPE__EXPORT_INTERFACES:=1 2 3
 
-MTB_RECIPE__NINJA_SUPPORT:=1
+MTB_RECIPE__NINJA_SUPPORT:=1 2
 
 # Programming interface description
 ifeq (,$(BSP_PROGRAM_INTERFACE))

@@ -1,12 +1,13 @@
 ################################################################################
-# \file device_groups.mk
+# \file features.mk
 #
 # \brief
-# Define the CY8CPROTO-062-4343W target.
+# Define the device gorups features.
 #
 ################################################################################
 # \copyright
-# Copyright 2018-2024 Cypress Semiconductor Corporation
+# (c) 2018-2025, Cypress Semiconductor Corporation (an Infineon company) or
+# an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");

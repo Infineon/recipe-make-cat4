@@ -1,3 +1,27 @@
+################################################################################
+# \file implementation.mk
+#
+# \brief
+# This make file is used for linker script validation.
+#
+################################################################################
+# \copyright
+# (c) 2024-2025, Cypress Semiconductor Corporation (an Infineon company) or
+# an affiliate of Cypress Semiconductor Corporation. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+################################################################################
 
 ################################################################################
 # Linker script verification
@@ -33,25 +57,19 @@ _MTB_RECIPE__ARM_GENERIC_LINKER_SCRIPT:=$(if $(LINKER_SCRIPT),$(LINKER_SCRIPT),$
 # C compiler flags
 #   - CFLAGS                -- set by user in Makefile.
 #   - MTB_TOOLCHAIN_CFLAGS   -- set by users selected toolchain.
-_MTB_RECIPE__ARM_GENERIC_CFLAGS=\
-    $(CFLAGS) \
-    $(MTB_TOOLCHAIN_$(TOOLCHAIN)__CFLAGS)
+_MTB_RECIPE__ARM_GENERIC_CFLAGS=$(MTB_TOOLCHAIN_$(TOOLCHAIN)__CFLAGS) $(CFLAGS)
 
 # C++ compiler flags
 #   - CXXFLAGS              -- set by user in Makefile.
 #   - CY_BSP_CXXFLAGS       -- set by BSP built on generic ARM recipe.
 #   - MTB_TOOLCHAIN_CXXFLAGS -- set by users selected toolchain.
-_MTB_RECIPE__ARM_GENERIC_CXXFLAGS=\
-    $(CXXFLAGS) \
-    $(MTB_TOOLCHAIN_$(TOOLCHAIN)__CXXFLAGS)
+_MTB_RECIPE__ARM_GENERIC_CXXFLAGS=$(MTB_TOOLCHAIN_$(TOOLCHAIN)__CXXFLAGS) $(CXXFLAGS)
 
 # Assembler flags
 #   - ASFLAGS               -- set by user in Makefile.
 #   - CY_BSP_ASFLAG         -- set by BSP built on generic ARM recipe.
 #   - MTB_TOOLCHAIN_ASFLAGS  -- set by users selected toolchain.
-_MTB_RECIPE__ARM_GENERIC_ASFLAGS=\
-    $(ASFLAGS) \
-    $(MTB_TOOLCHAIN_$(TOOLCHAIN)__ASFLAGS)
+_MTB_RECIPE__ARM_GENERIC_ASFLAGS=$(MTB_TOOLCHAIN_$(TOOLCHAIN)__ASFLAGS) $(ASFLAGS)
 
 # Linker flags
 #   - LDFLAGS               -- set by user in Makefile.
@@ -60,17 +78,15 @@ _MTB_RECIPE__ARM_GENERIC_ASFLAGS=\
 #   - MTB_TOOLCHAIN_LSFLAGS/ -- some toolchains use linker scripts
 #     LINKER_SCRIPT         -- others just pass a pile of args to the linker.
 _MTB_RECIPE__ARM_GENERIC_LDFLAGS=\
-    $(LDFLAGS) \
     $(MTB_TOOLCHAIN_$(TOOLCHAIN)__LDFLAGS) \
-    $(MTB_TOOLCHAIN_$(TOOLCHAIN)__LSFLAGS)$(_MTB_RECIPE__ARM_GENERIC_LINKER_SCRIPT)
+    $(MTB_TOOLCHAIN_$(TOOLCHAIN)__LSFLAGS)$(_MTB_RECIPE__ARM_GENERIC_LINKER_SCRIPT) \
+    $(LDFLAGS)
 
 # Archiver flags
 #   - ARFLAGS               -- set by user in Makefile.
 #   - CY_BSP_ARFLAGS        -- set by BSP built on generic ARM recipe.
 #   - MTB_TOOLCHAIN_ARFLAGS  -- set by users selected toolchain.
-_MTB_RECIPE__ARM_GENERIC_ARFLAGS=\
-    $(ARFLAGS) \
-    $(MTB_TOOLCHAIN_$(TOOLCHAIN)__ARFLAGS)
+_MTB_RECIPE__ARM_GENERIC_ARFLAGS=$(MTB_TOOLCHAIN_$(TOOLCHAIN)__ARFLAGS) $(ARFLAGS)
 
 
 ################################################################################

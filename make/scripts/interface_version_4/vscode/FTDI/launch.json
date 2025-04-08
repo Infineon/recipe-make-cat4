@@ -1,0 +1,42 @@
+        // When using 'launch', make sure your program is running on the board and that your
+        // executable matches the image in the chip exactly, or else strange things can happen
+        // with breakpoints, variables, etc.
+        {
+            "name": "Launch 43907 CR4 (FTDI)",
+            "type": "cortex-debug",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "executable": "&&_MTB_RECIPE__ELF_FILE&&",
+            "servertype": "openocd",
+            "searchDir": [
+                "${workspaceFolder}",
+                "${config:modustoolbox.toolsPath}/&&_MTB_RECIPE__OPENOCD_SCRIPTS_DIR_RELATIVE&&/"
+            ],
+            "configFiles": [
+                "openocd.tcl"
+            ],
+            "openOCDLaunchCommands": [
+                "init_debug_session"
+            ],
+            "overrideLaunchCommands": [
+                "set mem inaccessible-by-default off",
+                "-enable-pretty-printing",
+                "set remotetimeout 15",
+                "monitor reset init"
+            ],
+            "postStartSessionCommands": [       // Needed if runToMain is false
+                // Following two commands are needed to get gdb and openocd and HW all in sync.
+                // Or, execution context (PC, stack, registers, etc.) look like they are from before reset.
+                // The stepi, is a pretend instruction that does not actually do a stepi, but MUST be done
+                // Its a documented workaround in openocd. Do a 'monitor help' to see more info
+                //
+                // An alternative command to use is "continue" instead of the following two
+                "monitor gdb_sync",
+                "stepi"
+            ],
+            "overrideRestartCommands": [
+                "starti"
+            ],
+            "runToEntryPoint": "main",    // Specifies application entry point name where program will halt
+            "showDevDebugOutput": "none"
+        }

@@ -7,7 +7,8 @@
 #
 ################################################################################
 # \copyright
-# Copyright 2018-2024 Cypress Semiconductor Corporation
+# (c) 2018-2025, Cypress Semiconductor Corporation (an Infineon company) or
+# an affiliate of Cypress Semiconductor Corporation. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,8 +29,8 @@ $(info Processing $(lastword $(MAKEFILE_LIST)))
 endif
 
 # TRX header is necessary to have the image to pass the first stage bootloader in the 43907 chip. Refer to POSTBUILD
-_MTB_RECIPE__OPENOCD_SYMBOL_IMG=$(MTB_TOOLS__OUTPUT_CONFIG_DIR)/$(APPNAME).$(MTB_RECIPE__SUFFIX_TARGET)
-_MTB_RECIPE__OPENOCD_PROGRAM_IMG=$(MTB_TOOLS__OUTPUT_CONFIG_DIR)/$(APPNAME).trx.bin
+_MTB_RECIPE__OPENOCD_SYMBOL_IMG=$(_MTB_RECIPE__LAST_CONFIG_TARG_FILE)
+_MTB_RECIPE__OPENOCD_PROGRAM_IMG=$(_MTB_RECIPE__LAST_CONFIG_PROG_FILE)
 
 APP0_SECTOR_ADDRESS=0x00000000
 

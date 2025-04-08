@@ -1,0 +1,19 @@
+        // When using 'launch', make sure your program is running on the board and that your
+        // executable matches the image in the chip exactly, or else strange things can happen
+        // with breakpoints, variables, etc.
+        {
+            "name": "Launch 43907 CR4 (JLink)",
+            "type": "cortex-debug",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "executable": "&&_MTB_RECIPE__ELF_FILE&&",
+            "servertype": "jlink",
+            "device": "CYW43907",
+            "interface": "&&_MTB_RECIPE__PROBE_INTERFACE&&",
+            "serialNumber": "&&_MTB_RECIPE__PROBE_SERIAL&&",
+            "overrideRestartCommands": [
+                "starti"
+            ],
+            "runToEntryPoint": "main",    // Specifies application entry point name where program will halt
+            "showDevDebugOutput": "none"
+        }
